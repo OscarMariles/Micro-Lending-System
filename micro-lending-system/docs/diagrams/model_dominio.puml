@@ -1,0 +1,73 @@
+@startuml
+title Micro-Lending System - Domain Model
+
+package "DTOs (Exposure)" {
+    class LoanDTO {
+        +Long id
+        +BigDecimal amount
+        +Double interestRate
+        +String clientName
+        +String status
+        +List<InstallmentDTO> installments
+    }
+
+    class ClientDTO {
+        +Long id
+        +String fullName
+        +String taxId
+    }
+}
+
+package "Model (Persistence)" {
+    enum LoanStatus {
+        PENDING_APPROVAL
+        ACTIVE
+        OVERDUE
+        PAID
+        CANCELLED
+    }
+
+    class Client {
+        +Long id
+        +String firstName
+        +String lastName
+        +String taxId
+        +String email
+        +Boolean active
+        --
+        +getFullName()
+    }
+
+    class Loan {
+        +Long id
+        +BigDecimal principalAmount
+        +Double interestRate
+        +Integer termInMonths
+        +LocalDate startDate
+        +LoanStatus status
+        +Boolean deleted
+        --
+        +calculateTotalInterest()
+        +generateInstallments()
+    }
+
+    class Installment {
+        +Long id
+        +Integer number
+        +BigDecimal amount
+        +LocalDate dueDate
+        +Boolean isPaid
+        --
+        +markAsPaid()
+    }
+}
+
+' Relationships
+Client "1" -- "0..*" Loan : has >
+Loan "1" *-- "0..*" Installment : contains >
+
+' DTO Mappings (dashed lines)
+LoanDTO ..> Loan : maps from
+ClientDTO ..> Client : maps from
+
+@enduml
